@@ -34,5 +34,5 @@ jobs:
         with:
           path: |
             omod/target/*.omod
-          name: csaudecore-${{ env.VERSION }}-${{ env.COMMIT_SHA }}
+          name: csaudeinterop-${{ env.VERSION }}-${{ env.COMMIT_SHA }}
           compression-level: 0
