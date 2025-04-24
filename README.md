@@ -1,9 +1,9 @@
-C-Saúde Core
+C-Saúde interoperability
 ==========================
 
 Description
 -----------
-OpenMRS module with core components for the C-Saúde distribution.
+Core interoperability module between OpenMRS-based applications and external systems – CSAUDE.
 
 Building from Source
 --------------------
