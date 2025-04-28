@@ -57,10 +57,12 @@ public class CamelRouteInitializer implements InitializingBean {
 			public void configure() throws Exception {
 
 				from("direct:sendPatient").marshal(patientDataFormat)
-						.setHeader("Content-Type", constant("application/json")).to("jms:queue:patient.sync.queue");
+						.setHeader("Content-Type", constant("application/json"))
+						.to("jms:queue:patient.sync.queue?jmsMessageType=Text");
 
 				from("direct:sendPrescription").marshal(prescriptionDataFormat)
-						.setHeader("Content-Type", constant("application/json")).to("jms:queue:prescription.queue");
+						.setHeader("Content-Type", constant("application/json"))
+						.to("jms:queue:prescription.queue?jmsMessageType=Text");
 
 				from("jms:queue:prescription.response.queue").process(exchange -> {
 					String json = exchange.getIn().getBody(String.class);
