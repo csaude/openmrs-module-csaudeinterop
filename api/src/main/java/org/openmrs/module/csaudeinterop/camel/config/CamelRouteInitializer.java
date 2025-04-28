@@ -5,6 +5,7 @@ import javax.jms.ConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.component.jms.JmsComponent;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.csaudeinterop.camel.payload.DispensationPayload;
@@ -35,6 +36,12 @@ public class CamelRouteInitializer implements InitializingBean {
 	@Qualifier("adminService")
 	private AdministrationService administrationService;
 	
+	@Autowired
+	private JacksonDataFormat prescriptionDataFormat;
+	
+	@Autowired
+	private JacksonDataFormat patientDataFormat;
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
@@ -49,9 +56,11 @@ public class CamelRouteInitializer implements InitializingBean {
 			@Override
 			public void configure() throws Exception {
 
-				from("direct:sendPatient").marshal().json().to("jms:queue:patient.sync.queue");
+				from("direct:sendPatient").marshal(patientDataFormat)
+						.setHeader("Content-Type", constant("application/json")).to("jms:queue:patient.sync.queue");
 
-				from("direct:sendPrescription").marshal().json().to("jms:queue:prescription.queue");
+				from("direct:sendPrescription").marshal(prescriptionDataFormat)
+						.setHeader("Content-Type", constant("application/json")).to("jms:queue:prescription.queue");
 
 				from("jms:queue:prescription.response.queue").process(exchange -> {
 					String json = exchange.getIn().getBody(String.class);
