@@ -3,11 +3,15 @@ package org.openmrs.module.csaudeinterop.camel.service.impl;
 import org.apache.camel.ProducerTemplate;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.csaudeinterop.api.DispensationProcessorService;
+import org.openmrs.module.csaudeinterop.api.PatientSynchronizationResponseProcessorService;
 import org.openmrs.module.csaudeinterop.camel.payload.DispensationPayload;
 import org.openmrs.module.csaudeinterop.camel.payload.PatientPayload;
+import org.openmrs.module.csaudeinterop.camel.payload.PatientSyncResponsePayload;
 import org.openmrs.module.csaudeinterop.camel.payload.PrescriptionPayload;
 import org.openmrs.module.csaudeinterop.camel.payload.PrescriptionResponsePayload;
 import org.openmrs.module.csaudeinterop.camel.service.CamelMessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CamelMessageServiceImpl implements CamelMessageService {
 	
+	private static final Logger log = LoggerFactory.getLogger(CamelMessageServiceImpl.class);
+	
 	@Autowired
 	private ProducerTemplate producerTemplate;
 	
 	@Autowired
 	private DispensationProcessorService dispensationProcessorService;
+	
+	@Autowired
+	private PatientSynchronizationResponseProcessorService patientSynchronizationResponseProcessorService;
 	
 	@Override
 	public void publishPrescription(PrescriptionPayload payload) {
@@ -30,6 +39,7 @@ public class CamelMessageServiceImpl implements CamelMessageService {
 	@Override
 	public void publishPatient(PatientPayload payload) {
 		this.producerTemplate.sendBody("direct:sendPatient", payload);
+		System.out.println("sincronizado paciente com UUID " + payload.getPatientUuid());
 	}
 	
 	@Override
@@ -63,4 +73,17 @@ public class CamelMessageServiceImpl implements CamelMessageService {
 		}
 	}
 	
+	@Override
+	public void processPatientSyncResponse(PatientSyncResponsePayload payload) {
+		
+		try {
+			Context.authenticate("admin", "eSaude123");
+			
+			this.patientSynchronizationResponseProcessorService.process(payload);
+			
+		}
+		finally {
+			Context.closeSession();
+		}
+	}
 }

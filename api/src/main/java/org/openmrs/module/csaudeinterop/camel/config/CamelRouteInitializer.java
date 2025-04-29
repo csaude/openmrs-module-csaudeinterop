@@ -9,9 +9,10 @@ import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.component.jms.JmsComponent;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.csaudeinterop.camel.payload.DispensationPayload;
+import org.openmrs.module.csaudeinterop.camel.payload.PatientSyncResponsePayload;
 import org.openmrs.module.csaudeinterop.camel.payload.PrescriptionResponsePayload;
 import org.openmrs.module.csaudeinterop.camel.service.CamelMessageService;
-import org.openmrs.module.csaudeinterop.util.CSaudeCoreConstants;
+import org.openmrs.module.csaudeinterop.util.CSaudeInteropConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -47,10 +48,10 @@ public class CamelRouteInitializer implements InitializingBean {
 
 		JmsComponent jmsComponent = JmsComponent.jmsComponentAutoAcknowledge(connectionFactory());
 
-		jmsComponent.setUsername(this.administrationService.getGlobalProperty(CSaudeCoreConstants.ARTEMIS_USER_NAME));
-		jmsComponent.setPassword(this.administrationService.getGlobalProperty(CSaudeCoreConstants.ARTEMIS_PASSWORD));
+		jmsComponent.setUsername(this.administrationService.getGlobalProperty(CSaudeInteropConstants.ARTEMIS_USER_NAME));
+		jmsComponent.setPassword(this.administrationService.getGlobalProperty(CSaudeInteropConstants.ARTEMIS_PASSWORD));
 
-		this.camelContext.getRegistry().bind(CSaudeCoreConstants.JMS_COMPONENT, jmsComponent);
+		this.camelContext.getRegistry().bind(CSaudeInteropConstants.JMS_COMPONENT, jmsComponent);
 
 		this.camelContext.addRoutes(new RouteBuilder() {
 			@Override
@@ -76,6 +77,18 @@ public class CamelRouteInitializer implements InitializingBean {
 					camelMessageService.processPrescriptionResponse(new PrescriptionResponsePayload());
 				});
 
+				from("jms:queue:patient.sync.response.queue").process(exchange -> {
+					String json = exchange.getIn().getBody(String.class);
+					ObjectMapper mapper = new ObjectMapper();
+
+					// TODO: alterar o object para PrescriptionResponsePayload, representa a
+					// resposta da prescricao
+					PatientSyncResponsePayload response = mapper.readValue(json, PatientSyncResponsePayload.class);
+					log.info(String.format("payload consumido (Patient Sync Response) '%s'", response));
+
+					camelMessageService.processPrescriptionResponse(new PrescriptionResponsePayload());
+				});
+
 				from("jms:queue:dispensation.queue").process(exchange -> {
 					String json = exchange.getIn().getBody(String.class);
 					ObjectMapper mapper = new ObjectMapper();
@@ -89,6 +102,6 @@ public class CamelRouteInitializer implements InitializingBean {
 	
 	private ConnectionFactory connectionFactory() {
 		return new ActiveMQConnectionFactory(
-		        this.administrationService.getGlobalProperty(CSaudeCoreConstants.URL_ACTIVEMQ_ARTEMIS));
+		        this.administrationService.getGlobalProperty(CSaudeInteropConstants.URL_ACTIVEMQ_ARTEMIS));
 	}
 }

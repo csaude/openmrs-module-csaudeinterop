@@ -2,7 +2,7 @@ package org.openmrs.module.csaudeinterop.webservice.resources;
 
 import org.openmrs.module.csaudeinterop.camel.payload.PatientPayload;
 import org.openmrs.module.csaudeinterop.camel.service.CamelMessageService;
-import org.openmrs.module.csaudeinterop.util.CSaudeCoreConstants;
+import org.openmrs.module.csaudeinterop.util.CSaudeInteropConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/rest/v1" + CSaudeCoreConstants.CSAUDECORE_NAMESPACE + "/patient")
+@RequestMapping("/rest/v1" + CSaudeInteropConstants.CSAUDECORE_NAMESPACE + "/patient")
 public class PatientResource {
 	
 	@Autowired

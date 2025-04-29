@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PatientPayload {
 	
+	@JsonProperty("encounterUuid")
+	private String encounterUuid;
+	
 	@JsonProperty("patientUuid")
 	private String patientUuid;
 	
@@ -56,6 +59,14 @@ public class PatientPayload {
 	
 	@JsonProperty("clinicalHistory")
 	private List<ClinicalHistory> clinicalHistory;
+	
+	public String getEncounterUuid() {
+		return encounterUuid;
+	}
+	
+	public void setEncounterUuid(String encounterUuid) {
+		this.encounterUuid = encounterUuid;
+	}
 	
 	public String getPatientUuid() {
 		return patientUuid;

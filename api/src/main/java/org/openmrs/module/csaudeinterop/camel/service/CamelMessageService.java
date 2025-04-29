@@ -2,6 +2,7 @@ package org.openmrs.module.csaudeinterop.camel.service;
 
 import org.openmrs.module.csaudeinterop.camel.payload.DispensationPayload;
 import org.openmrs.module.csaudeinterop.camel.payload.PatientPayload;
+import org.openmrs.module.csaudeinterop.camel.payload.PatientSyncResponsePayload;
 import org.openmrs.module.csaudeinterop.camel.payload.PrescriptionPayload;
 import org.openmrs.module.csaudeinterop.camel.payload.PrescriptionResponsePayload;
 
@@ -34,5 +35,7 @@ public interface CamelMessageService {
 	 * @param responsePayload the payload from the external system
 	 */
 	void consumeAndPersistDispensation(DispensationPayload payload);
+	
+	void processPatientSyncResponse(PatientSyncResponsePayload payload);
 	
 }
