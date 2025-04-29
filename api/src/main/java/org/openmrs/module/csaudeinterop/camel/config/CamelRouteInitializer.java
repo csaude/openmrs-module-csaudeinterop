@@ -13,8 +13,6 @@ import org.openmrs.module.csaudeinterop.camel.payload.PatientSyncResponsePayload
 import org.openmrs.module.csaudeinterop.camel.payload.PrescriptionResponsePayload;
 import org.openmrs.module.csaudeinterop.camel.service.CamelMessageService;
 import org.openmrs.module.csaudeinterop.util.CSaudeInteropConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class CamelRouteInitializer implements InitializingBean {
-	
-	private static final Logger log = LoggerFactory.getLogger(CamelRouteInitializer.class);
 	
 	@Autowired
 	private CamelContext camelContext;
@@ -48,7 +44,8 @@ public class CamelRouteInitializer implements InitializingBean {
 
 		JmsComponent jmsComponent = JmsComponent.jmsComponentAutoAcknowledge(connectionFactory());
 
-		jmsComponent.setUsername(this.administrationService.getGlobalProperty(CSaudeInteropConstants.ARTEMIS_USER_NAME));
+		jmsComponent
+				.setUsername(this.administrationService.getGlobalProperty(CSaudeInteropConstants.ARTEMIS_USER_NAME));
 		jmsComponent.setPassword(this.administrationService.getGlobalProperty(CSaudeInteropConstants.ARTEMIS_PASSWORD));
 
 		this.camelContext.getRegistry().bind(CSaudeInteropConstants.JMS_COMPONENT, jmsComponent);
@@ -69,24 +66,18 @@ public class CamelRouteInitializer implements InitializingBean {
 					String json = exchange.getIn().getBody(String.class);
 					ObjectMapper mapper = new ObjectMapper();
 
-					// TODO: alterar o object para PrescriptionResponsePayload, representa a
-					// resposta da prescricao
-					Object response = mapper.readValue(json, Object.class);
+					PrescriptionResponsePayload response = mapper.readValue(json, PrescriptionResponsePayload.class);
 					log.info(String.format("payload consumido (Prescription Response) '%s'", response));
-
-					camelMessageService.processPrescriptionResponse(new PrescriptionResponsePayload());
+					camelMessageService.processPrescriptionResponse(response);
 				});
 
 				from("jms:queue:patient.sync.response.queue").process(exchange -> {
 					String json = exchange.getIn().getBody(String.class);
 					ObjectMapper mapper = new ObjectMapper();
 
-					// TODO: alterar o object para PrescriptionResponsePayload, representa a
-					// resposta da prescricao
 					PatientSyncResponsePayload response = mapper.readValue(json, PatientSyncResponsePayload.class);
 					log.info(String.format("payload consumido (Patient Sync Response) '%s'", response));
-
-					camelMessageService.processPrescriptionResponse(new PrescriptionResponsePayload());
+					camelMessageService.processPatientSyncResponse(response);
 				});
 
 				from("jms:queue:dispensation.queue").process(exchange -> {
