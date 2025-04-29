@@ -21,6 +21,9 @@ public class PatientPayload {
 	@JsonProperty("birthDate")
 	private String birthDate;
 	
+	@JsonProperty("birthdateEstimated")
+	private String birthdateEstimated;
+	
 	@JsonProperty("gender")
 	private String gender;
 	
@@ -191,6 +194,14 @@ public class PatientPayload {
 	
 	public void setClinicalHistory(List<ClinicalHistory> clinicalHistory) {
 		this.clinicalHistory = clinicalHistory;
+	}
+	
+	public String getBirthdateEstimated() {
+		return birthdateEstimated;
+	}
+	
+	public void setBirthdateEstimated(String birthdateEstimated) {
+		this.birthdateEstimated = birthdateEstimated;
 	}
 	
 	public static class ClinicalHistory {
