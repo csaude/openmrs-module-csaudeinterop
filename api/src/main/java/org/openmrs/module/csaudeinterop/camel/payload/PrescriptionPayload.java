@@ -33,6 +33,10 @@ public class PrescriptionPayload {
 	private String notes;
 	
 	private List<Formulation> prescribedDrugs;
+
+	private String type;
+
+	private String sectorUuid;
 	
 	public String getClinicalService() {
 		return clinicalService;
@@ -152,5 +156,21 @@ public class PrescriptionPayload {
 	
 	public void setPrescribedDrugs(List<Formulation> prescribedDrugs) {
 		this.prescribedDrugs = prescribedDrugs;
+	}
+
+	public String getType() {
+		return type;
+	};
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getSectorUuid() {
+		return sectorUuid;
+	}
+
+	public void setSectorUuid(String sectorUuid) {
+		this.sectorUuid = sectorUuid;
 	}
 }
